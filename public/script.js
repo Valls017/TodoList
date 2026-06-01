@@ -4,6 +4,12 @@ const tablaTareas = document.getElementById("tablaTareas");
 const inputArchivoDrive = document.getElementById("archivoDrive");
 const btnSubirArchivo = document.getElementById("btnSubirArchivo");
 const tablaArchivos = document.getElementById("tablaArchivos");
+const totalTareas = document.getElementById("totalTareas");
+const tareasPendientes = document.getElementById("tareasPendientes");
+const tareasCompletadas = document.getElementById("tareasCompletadas");
+const totalArchivos = document.getElementById("totalArchivos");
+const estadoVacioTareas = document.getElementById("estadoVacioTareas");
+const estadoVacioArchivos = document.getElementById("estadoVacioArchivos");
 
 btnAgregar.addEventListener("click", agregarTarea);
 btnSubirArchivo.addEventListener("click", subirArchivo);
@@ -13,6 +19,10 @@ inputTitulo.addEventListener("keypress", function (event) {
     agregarTarea();
   }
 });
+
+function textoCantidad(cantidad, singular, plural) {
+  return `${cantidad} ${cantidad === 1 ? singular : plural}`;
+}
 
 async function agregarTarea() {
   const titulo = inputTitulo.value.trim();
@@ -44,36 +54,60 @@ async function agregarTarea() {
 async function cargarTareas() {
   const respuesta = await fetch("/todos");
   const resultado = await respuesta.json();
+  const tareas = resultado.data || [];
+  const metadata = resultado.metadata || {};
+  const total = metadata.totalGeneral ?? tareas.length;
+  const pendientes = metadata.pendientes ?? 0;
+  const completadas = metadata.completadas ?? 0;
 
   tablaTareas.innerHTML = "";
+  totalTareas.textContent = textoCantidad(total, "tarea", "tareas");
+  tareasPendientes.textContent = textoCantidad(pendientes, "pendiente", "pendientes");
+  tareasCompletadas.textContent = textoCantidad(completadas, "completada", "completadas");
+  estadoVacioTareas.hidden = tareas.length > 0;
 
-  resultado.data.forEach(function (tarea) {
+  tareas.forEach(function (tarea) {
     const fila = document.createElement("tr");
 
-    fila.innerHTML = `
-      <td>
-        <input
-          type="checkbox"
-          ${tarea.completado ? "checked" : ""}
-          onchange="cambiarEstado(${tarea.id}, ${tarea.completado})"
-        >
-      </td>
+    const estado = document.createElement("td");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = tarea.completado;
+    checkbox.addEventListener("change", function () {
+      cambiarEstado(tarea.id, tarea.completado);
+    });
+    estado.appendChild(checkbox);
 
-      <td class="${tarea.completado ? "tarea-completada" : ""}">
-        ${tarea.titulo}
-      </td>
+    const titulo = document.createElement("td");
+    titulo.textContent = tarea.titulo;
 
-      <td>
-        <button class="btn-editar" onclick="editarTarea(${tarea.id})">
-          Editar
-        </button>
+    if (tarea.completado) {
+      titulo.classList.add("tarea-completada");
+    }
 
-        <button class="btn-eliminar" onclick="eliminarTarea(${tarea.id})">
-          Eliminar
-        </button>
-      </td>
-    `;
+    const acciones = document.createElement("td");
+    const botonEditar = document.createElement("button");
+    botonEditar.className = "btn-editar";
+    botonEditar.textContent = "Editar";
+    botonEditar.addEventListener("click", function () {
+      editarTarea(tarea.id);
+    });
 
+    const botonEliminar = document.createElement("button");
+    botonEliminar.className = "btn-eliminar";
+    botonEliminar.textContent = "Eliminar";
+    botonEliminar.addEventListener("click", function () {
+      eliminarTarea(tarea.id);
+    });
+
+    const grupoAcciones = document.createElement("div");
+    grupoAcciones.className = "actions";
+    grupoAcciones.appendChild(botonEditar);
+    grupoAcciones.appendChild(botonEliminar);
+    acciones.appendChild(grupoAcciones);
+    fila.appendChild(estado);
+    fila.appendChild(titulo);
+    fila.appendChild(acciones);
     tablaTareas.appendChild(fila);
   });
 }
@@ -95,9 +129,7 @@ async function cambiarEstado(id, estadoActual) {
 async function editarTarea(id) {
   const respuesta = await fetch(`/todos/${id}`);
   const resultado = await respuesta.json();
-
   const tituloActual = resultado.data.titulo;
-
   const nuevoTitulo = prompt("Editar tarea:", tituloActual);
 
   if (nuevoTitulo === null) {
@@ -169,31 +201,54 @@ async function subirArchivo() {
 async function cargarArchivos() {
   const respuesta = await fetch("/files");
   const resultado = await respuesta.json();
+  const archivos = resultado.data || [];
 
   tablaArchivos.innerHTML = "";
+  totalArchivos.textContent = textoCantidad(archivos.length, "archivo", "archivos");
+  estadoVacioArchivos.hidden = archivos.length > 0;
 
-  resultado.data.forEach(function (archivo) {
+  archivos.forEach(function (archivo) {
     const fila = document.createElement("tr");
 
-    fila.innerHTML = `
-      <td>${archivo.id}</td>
-      <td>${archivo.originalName}</td>
-      <td>${formatearTamano(archivo.size)}</td>
-      <td>
-        <button class="btn-editar" onclick="editarArchivo(${archivo.id}, '${archivo.originalName.replace(/'/g, "\\'")}')">
-          Editar
-        </button>
+    const id = document.createElement("td");
+    id.textContent = archivo.id;
 
-        <a class="btn-descargar" href="${archivo.downloadUrl}">
-          Descargar
-        </a>
+    const nombre = document.createElement("td");
+    nombre.textContent = archivo.originalName;
 
-        <button class="btn-eliminar" onclick="eliminarArchivo(${archivo.id})">
-          Eliminar
-        </button>
-      </td>
-    `;
+    const tamano = document.createElement("td");
+    tamano.textContent = formatearTamano(archivo.size);
 
+    const acciones = document.createElement("td");
+    const botonEditar = document.createElement("button");
+    botonEditar.className = "btn-editar";
+    botonEditar.textContent = "Editar";
+    botonEditar.addEventListener("click", function () {
+      editarArchivo(archivo.id, archivo.originalName);
+    });
+
+    const enlaceDescarga = document.createElement("a");
+    enlaceDescarga.className = "btn-descargar";
+    enlaceDescarga.href = archivo.downloadUrl;
+    enlaceDescarga.textContent = "Descargar";
+
+    const botonEliminar = document.createElement("button");
+    botonEliminar.className = "btn-eliminar";
+    botonEliminar.textContent = "Eliminar";
+    botonEliminar.addEventListener("click", function () {
+      eliminarArchivo(archivo.id);
+    });
+
+    const grupoAcciones = document.createElement("div");
+    grupoAcciones.className = "actions";
+    grupoAcciones.appendChild(botonEditar);
+    grupoAcciones.appendChild(enlaceDescarga);
+    grupoAcciones.appendChild(botonEliminar);
+    acciones.appendChild(grupoAcciones);
+    fila.appendChild(id);
+    fila.appendChild(nombre);
+    fila.appendChild(tamano);
+    fila.appendChild(acciones);
     tablaArchivos.appendChild(fila);
   });
 }
@@ -208,11 +263,11 @@ async function editarArchivo(id, nombreActual) {
   const nombreLimpio = nuevoNombre.trim();
 
   if (nombreLimpio.length < 1) {
-    alert("El nombre del archivo no puede estar vacio");
+    alert("El nombre del archivo no puede estar vacío");
     return;
   }
 
-  const reemplazar = confirm("¿Quieres reemplazar tambien el contenido del archivo? Presiona Cancelar si solo quieres cambiar el nombre.");
+  const reemplazar = confirm("¿Quieres reemplazar también el contenido del archivo? Presiona Cancelar si solo quieres cambiar el nombre.");
 
   if (reemplazar) {
     const inputTemporal = document.createElement("input");

@@ -2,62 +2,91 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lista de Tareas y Drive</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Organizador local</p>
+        <h1>Lista de tareas</h1>
+      </div>
+      <span class="status-pill">UMSS</span>
+    </header>
 
-  <div class="contenedor">
-    <h1>Lista de Tareas</h1>
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Pendientes</p>
+          <h2>Tareas</h2>
+        </div>
 
-    <div class="formulario">
-      <input type="text" id="titulo" placeholder="Escribe una tarea...">
-      <button id="btnAgregar">Añadir</button>
-    </div>
+        <div class="stats">
+          <span id="totalTareas">0 tareas</span>
+          <span id="tareasPendientes">0 pendientes</span>
+          <span id="tareasCompletadas">0 completadas</span>
+        </div>
+      </div>
 
-    <hr>
+      <div class="formulario">
+        <input type="text" id="titulo" placeholder="Escribe una tarea...">
+        <button id="btnAgregar" class="btn btn-primary">Añadir</button>
+      </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Tarea</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Estado</th>
+              <th>Tarea</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
 
-      <tbody id="tablaTareas">
-      </tbody>
-    </table>
+          <tbody id="tablaTareas">
+          </tbody>
+        </table>
+      </div>
 
-    <hr>
+      <p id="estadoVacioTareas" class="empty-state" hidden>No hay tareas todavía.</p>
+    </section>
 
-    <section class="drive">
-      <h2>Drive de archivos</h2>
-      <p class="texto-ayuda">
-        En esta sección puedes subir archivos al servidor y luego editarlos, eliminarlos o descargarlos.
-      </p>
+    <section class="panel drive">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Archivos</p>
+          <h2>Drive local</h2>
+        </div>
+
+        <span id="totalArchivos" class="counter-pill">0 archivos</span>
+      </div>
 
       <div class="formulario-archivo">
         <input type="file" id="archivoDrive">
-        <button id="btnSubirArchivo">Subir</button>
+        <button id="btnSubirArchivo" class="btn btn-primary">Subir</button>
       </div>
 
-      <table class="tabla-archivos">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Archivo</th>
-            <th>Tamaño</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
+      <div class="table-wrap">
+        <table class="tabla-archivos">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Archivo</th>
+              <th>Tamaño</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
 
-        <tbody id="tablaArchivos">
-        </tbody>
-      </table>
+          <tbody id="tablaArchivos">
+          </tbody>
+        </table>
+      </div>
+
+      <p id="estadoVacioArchivos" class="empty-state" hidden>No hay archivos subidos.</p>
     </section>
-  </div>
+  </main>
 
   <script src="script.js"></script>
 </body>

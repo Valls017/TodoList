@@ -1,0 +1,12 @@
+node_modules/
+.env
+*.log
+npm-debug.log*
+
+data/*.db
+drive/*
+!data/.gitkeep
+!drive/.gitkeep
+
+.DS_Store
+Thumbs.db
