@@ -1,0 +1,266 @@
+{
+  "info": {
+    "name": "TODO LIST REST API FINAL ESTUDIANTE",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Listar tareas",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/todos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Crear tarea",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Estudiar API REST\",\n  \"descripcion\": \"Repasar GET POST PUT DELETE\",\n  \"prioridad\": \"media\",\n  \"categoria\": \"Universidad\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/todos",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Buscar por ID",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/todos/{{todo_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos",
+            "{{todo_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Actualizar tarea",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"completado\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/todos/{{todo_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos",
+            "{{todo_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Eliminar tarea",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/todos/{{todo_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "todos",
+            "{{todo_id}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Listar archivos Drive",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/files",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "files"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Buscar archivo por ID",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/files/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "files",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Subir archivo Drive",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/files?filename=documento.pdf",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "files"
+          ]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/octet-stream"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "Editar nombre de archivo Drive",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/files/1?filename=nuevo-nombre.pdf",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "files",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Reemplazar contenido de archivo Drive",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/files/1?filename=nuevo-nombre.pdf",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "files",
+            "1"
+          ]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/octet-stream"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": ""
+          }
+        }
+      }
+    },
+    {
+      "name": "Descargar archivo Drive",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/files/1/download",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "files",
+            "1",
+            "download"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Eliminar archivo Drive",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/files/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "files",
+            "1"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "todo_id",
+      "value": "1"
+    }
+  ]
+}
