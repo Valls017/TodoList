@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Tareas y Drive</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="contenedor">
+    <h1>Lista de Tareas</h1>
+
+    <div class="formulario">
+      <input type="text" id="titulo" placeholder="Escribe una tarea...">
+      <button id="btnAgregar">Añadir</button>
+    </div>
+
+    <hr>
+
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Tarea</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+
+      <tbody id="tablaTareas">
+      </tbody>
+    </table>
+
+    <hr>
+
+    <section class="drive">
+      <h2>Drive de archivos</h2>
+      <p class="texto-ayuda">
+        En esta sección puedes subir archivos al servidor.
+      </p>
+
+      <div class="formulario-archivo">
+        <input type="file" id="archivoDrive">
+        <button id="btnSubirArchivo">Subir</button>
+      </div>
+
+      <table class="tabla-archivos">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Archivo</th>
+            <th>Tamaño</th>
+          </tr>
+        </thead>
+
+        <tbody id="tablaArchivos">
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
