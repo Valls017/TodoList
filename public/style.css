@@ -69,6 +69,14 @@ input {
   padding: 30px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .panel {
   margin-top: 18px;
   padding: 24px;
@@ -237,6 +245,17 @@ h2 {
   filter: saturate(1.08) brightness(0.98);
 }
 
+.btn-secondary {
+  min-width: 92px;
+  border: 1px solid var(--line-strong);
+  background: #ffffff;
+  color: var(--ink-soft);
+}
+
+.btn-secondary:hover {
+  background: #f5ffff;
+}
+
 .btn-editar {
   background: linear-gradient(135deg, var(--mint), var(--mint-dark));
   color: #062323;
@@ -352,6 +371,102 @@ input[type="checkbox"] {
   overflow-wrap: anywhere;
 }
 
+.auth-shell {
+  display: grid;
+  place-items: center;
+  width: min(100% - 32px, 520px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 34px 0;
+}
+
+.auth-panel {
+  width: 100%;
+  padding: 30px;
+  border: 1px solid rgba(216, 232, 234, 0.9);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(18px);
+}
+
+.auth-panel h1 {
+  margin-bottom: 22px;
+  font-size: 42px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 15px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font-size: 16px;
+  outline: none;
+  transition:
+    border-color var(--ease),
+    box-shadow var(--ease),
+    background-color var(--ease);
+}
+
+.field input:focus {
+  border-color: var(--aqua-strong);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(0, 255, 240, 0.22);
+}
+
+.auth-message {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.auth-message.error {
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #991b1b;
+}
+
+.auth-message.success {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.auth-switch {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-weight: 700;
+  text-align: center;
+}
+
+.auth-switch a {
+  color: #087a76;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
 @keyframes rowIn {
   from {
     opacity: 0;
@@ -393,6 +508,12 @@ input[type="checkbox"] {
     flex-direction: column;
   }
 
+  .header-actions {
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
   .app-header,
   .panel {
     padding: 18px;
@@ -431,5 +552,23 @@ input[type="checkbox"] {
 
   .btn-primary {
     width: 100%;
+  }
+
+  .header-actions .btn,
+  .header-actions .status-pill {
+    width: 100%;
+  }
+
+  .auth-shell {
+    width: min(100% - 20px, 520px);
+    padding: 18px 0;
+  }
+
+  .auth-panel {
+    padding: 22px;
+  }
+
+  .auth-panel h1 {
+    font-size: 36px;
   }
 }

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { getDB } = require("../config/db");
+const authMiddleware = require("../middleware/authMiddleware");
 
 function convertirTarea(todo) {
   return {
@@ -8,6 +9,8 @@ function convertirTarea(todo) {
     completado: Boolean(todo.completado)
   };
 }
+
+router.use(authMiddleware);
 
 // GET /todos
 // Lista todas las tareas.

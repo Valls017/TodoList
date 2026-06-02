@@ -10,15 +10,85 @@ const tareasCompletadas = document.getElementById("tareasCompletadas");
 const totalArchivos = document.getElementById("totalArchivos");
 const estadoVacioTareas = document.getElementById("estadoVacioTareas");
 const estadoVacioArchivos = document.getElementById("estadoVacioArchivos");
+const nombreUsuario = document.getElementById("nombreUsuario");
+const btnSalir = document.getElementById("btnSalir");
 
-btnAgregar.addEventListener("click", agregarTarea);
-btnSubirArchivo.addEventListener("click", subirArchivo);
+const TOKEN_KEY = "token";
+const USUARIO_KEY = "usuario";
 
-inputTitulo.addEventListener("keypress", function (event) {
-  if (event.key === "Enter") {
-    agregarTarea();
+function redirigirLogin() {
+  window.location.href = "/app/login.html";
+}
+
+function obtenerToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+function cerrarSesion() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USUARIO_KEY);
+  redirigirLogin();
+}
+
+function mostrarUsuario() {
+  const usuarioGuardado = localStorage.getItem(USUARIO_KEY);
+
+  if (!usuarioGuardado) {
+    nombreUsuario.textContent = "Usuario";
+    return;
   }
-});
+
+  try {
+    const usuario = JSON.parse(usuarioGuardado);
+    nombreUsuario.textContent = usuario.nombre || usuario.email || "Usuario";
+  } catch (error) {
+    nombreUsuario.textContent = "Usuario";
+  }
+}
+
+function crearHeaders(headers = {}) {
+  return {
+    ...headers,
+    Authorization: `Bearer ${obtenerToken()}`
+  };
+}
+
+async function fetchConAuth(url, options = {}) {
+  const token = obtenerToken();
+
+  if (!token) {
+    cerrarSesion();
+    throw new Error("Token no encontrado");
+  }
+
+  const respuesta = await fetch(url, {
+    ...options,
+    headers: crearHeaders(options.headers || {})
+  });
+
+  if (respuesta.status === 401 || respuesta.status === 403) {
+    cerrarSesion();
+    throw new Error("Sesion expirada");
+  }
+
+  return respuesta;
+}
+
+function iniciarApp() {
+  btnAgregar.addEventListener("click", agregarTarea);
+  btnSubirArchivo.addEventListener("click", subirArchivo);
+  btnSalir.addEventListener("click", cerrarSesion);
+
+  inputTitulo.addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+      agregarTarea();
+    }
+  });
+
+  mostrarUsuario();
+  cargarTareas();
+  cargarArchivos();
+}
 
 function textoCantidad(cantidad, singular, plural) {
   return `${cantidad} ${cantidad === 1 ? singular : plural}`;
@@ -39,7 +109,7 @@ async function agregarTarea() {
     categoria: "General"
   };
 
-  await fetch("/todos", {
+  await fetchConAuth("/todos", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -52,7 +122,7 @@ async function agregarTarea() {
 }
 
 async function cargarTareas() {
-  const respuesta = await fetch("/todos");
+  const respuesta = await fetchConAuth("/todos");
   const resultado = await respuesta.json();
   const tareas = resultado.data || [];
   const metadata = resultado.metadata || {};
@@ -113,7 +183,7 @@ async function cargarTareas() {
 }
 
 async function cambiarEstado(id, estadoActual) {
-  await fetch(`/todos/${id}`, {
+  await fetchConAuth(`/todos/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
@@ -127,7 +197,7 @@ async function cambiarEstado(id, estadoActual) {
 }
 
 async function editarTarea(id) {
-  const respuesta = await fetch(`/todos/${id}`);
+  const respuesta = await fetchConAuth(`/todos/${id}`);
   const resultado = await respuesta.json();
   const tituloActual = resultado.data.titulo;
   const nuevoTitulo = prompt("Editar tarea:", tituloActual);
@@ -143,7 +213,7 @@ async function editarTarea(id) {
     return;
   }
 
-  await fetch(`/todos/${id}`, {
+  await fetchConAuth(`/todos/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
@@ -157,7 +227,7 @@ async function editarTarea(id) {
 }
 
 async function eliminarTarea(id) {
-  await fetch(`/todos/${id}`, {
+  await fetchConAuth(`/todos/${id}`, {
     method: "DELETE"
   });
 
@@ -318,5 +388,8 @@ async function eliminarArchivo(id) {
   cargarArchivos();
 }
 
-cargarTareas();
-cargarArchivos();
+if (obtenerToken()) {
+  iniciarApp();
+} else {
+  redirigirLogin();
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro | Lista de Tareas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="auth-shell">
+    <section class="auth-panel">
+      <p class="eyebrow">Cuenta nueva</p>
+      <h1>Registrarse</h1>
+
+      <form id="formRegistro" class="auth-form">
+        <label class="field">
+          <span>Nombre</span>
+          <input type="text" id="nombre" autocomplete="name" required>
+        </label>
+
+        <label class="field">
+          <span>Email</span>
+          <input type="email" id="email" autocomplete="email" required>
+        </label>
+
+        <label class="field">
+          <span>Contrasena</span>
+          <input type="password" id="password" autocomplete="new-password" minlength="6" required>
+        </label>
+
+        <p id="mensajeAuth" class="auth-message" hidden></p>
+
+        <button type="submit" class="btn btn-primary">Crear cuenta</button>
+      </form>
+
+      <p class="auth-switch">
+        Ya tienes cuenta?
+        <a href="/app/login.html">Inicia sesion</a>
+      </p>
+    </section>
+  </main>
+
+  <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Lista de Tareas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="auth-shell">
+    <section class="auth-panel">
+      <p class="eyebrow">Acceso</p>
+      <h1>Iniciar sesion</h1>
+
+      <form id="formLogin" class="auth-form">
+        <label class="field">
+          <span>Email</span>
+          <input type="email" id="email" autocomplete="email" required>
+        </label>
+
+        <label class="field">
+          <span>Contrasena</span>
+          <input type="password" id="password" autocomplete="current-password" required>
+        </label>
+
+        <p id="mensajeAuth" class="auth-message" hidden></p>
+
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+
+      <p class="auth-switch">
+        No tienes cuenta?
+        <a href="/app/register.html">Registrate</a>
+      </p>
+    </section>
+  </main>
+
+  <script src="auth.js"></script>
+</body>
+</html>

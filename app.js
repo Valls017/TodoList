@@ -6,7 +6,7 @@ const path = require("path");
 const { connectDB } = require("./config/db");
 const todoRoutes = require("./routes/todoRoutes");
 const fileRoutes = require("./routes/fileRoutes");
-
+const authRoutes = require("./routes/authRoutes");
 dotenv.config();
 
 const app = express();
@@ -29,6 +29,8 @@ app.get("/", (req, res) => {
     pantalla: "/app",
     endpoints: {
       health: "/health",
+      authRegister: "/auth/register",
+      authLogin: "/auth/login",
       todos: "/todos",
       todoById: "/todos/:id",
       files: "/files",
@@ -47,6 +49,9 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Todas las rutas de autenticacion empiezan con /auth.
+app.use("/auth", authRoutes);
+
 // Todas las rutas de tareas empiezan con /todos.
 app.use("/todos", todoRoutes);
 
@@ -61,6 +66,7 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
     console.log(`Pantalla: http://localhost:${PORT}/app`);
+    console.log(`Auth: http://localhost:${PORT}/auth/login`);
     console.log(`API: http://localhost:${PORT}/todos`);
   });
 }
