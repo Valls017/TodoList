@@ -7,14 +7,8 @@ const { connectDB } = require("./config/db");
 const todoRoutes = require("./routes/todoRoutes");
 const fileRoutes = require("./routes/fileRoutes");
 const authRoutes = require("./routes/authRoutes");
-const rateLimit = require("express-rate-limit");
 
 dotenv.config();
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 10, // máximo 10 intentos
-  message: { error: "Demasiados intentos, esperá 15 minutos" }
-});
 const app = express();
 
 // ETag HTTP. Sirve para que Express mande un identificador de versión de la respuesta en los headers.
@@ -56,7 +50,7 @@ app.get("/health", (req, res) => {
 });
 
 // Todas las rutas de autenticacion empiezan con /auth.
-app.use("/auth", authLimiter, authRoutes);
+app.use("/auth", authRoutes);
 
 // Todas las rutas de tareas empiezan con /todos.
 app.use("/todos", todoRoutes);
