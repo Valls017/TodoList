@@ -2,13 +2,14 @@ const express = require("express");
 const router = express.Router();
 const { getDB } = require("../config/db");
 const authMiddleware = require("../middleware/authMiddleware");
-
+const { validarTodo } = require("../validators/todoValidator");
 function convertirTarea(todo) {
   return {
     ...todo,
     completado: Boolean(todo.completado)
   };
 }
+const { sanitizarTexto } = require("../utils/sanitize");
 
 router.use(authMiddleware);
 
@@ -18,11 +19,13 @@ router.get("/", async (req, res) => {
   try {
     const db = getDB();
 
-    const todos = await db.all("SELECT * FROM todos ORDER BY id DESC");
+    const userId = req.user.id;
 
-    const totalGeneral = await db.get("SELECT COUNT(*) AS total FROM todos");
-    const completadas = await db.get("SELECT COUNT(*) AS total FROM todos WHERE completado = 1");
-    const pendientes = await db.get("SELECT COUNT(*) AS total FROM todos WHERE completado = 0");
+    const todos = await db.all("SELECT * FROM todos WHERE userId = ? ORDER BY id DESC", userId);
+
+    const totalGeneral = await db.get("SELECT COUNT(*) AS total FROM todos WHERE userId = ?", userId);
+    const completadas = await db.get("SELECT COUNT(*) AS total FROM todos WHERE completado = 1 AND userId = ?", userId);
+    const pendientes = await db.get("SELECT COUNT(*) AS total FROM todos WHERE completado = 0 AND userId = ?", userId);
 
     res.json({
       metadata: {
@@ -47,7 +50,7 @@ router.get("/:id", async (req, res) => {
   try {
     const db = getDB();
 
-    const todo = await db.get("SELECT * FROM todos WHERE id = ?", req.params.id);
+    const todo = await db.get("SELECT * FROM todos WHERE id = ? AND userId = ?", [req.params.id, req.user.id]);
 
     if (!todo) {
       return res.status(404).json({ message: "Tarea no encontrada" });
@@ -71,12 +74,12 @@ router.get("/:id", async (req, res) => {
 
 // POST /todos
 // Crea una tarea.
-router.post("/", async (req, res) => {
+router.post("/", validarTodo, async (req, res) => {
   try {
     const db = getDB();
 
-    const titulo = req.body.titulo;
-    const descripcion = req.body.descripcion || "";
+    const titulo = sanitizarTexto(req.body.titulo);
+    const descripcion = sanitizarTexto(req.body.descripcion || "");
     const prioridad = req.body.prioridad || "media";
     const categoria = req.body.categoria || "General";
     const fechaLimite = req.body.fechaLimite || null;
@@ -89,9 +92,9 @@ router.post("/", async (req, res) => {
 
     const result = await db.run(
       `INSERT INTO todos
-      (titulo, descripcion, completado, prioridad, categoria, fechaLimite, createdAt, updatedAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [titulo.trim(), descripcion.trim(), 0, prioridad, categoria, fechaLimite, ahora, ahora]
+      (userId, titulo, descripcion, completado, prioridad, categoria, fechaLimite, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [req.user.id, titulo.trim(), descripcion.trim(), 0, prioridad, categoria, fechaLimite, ahora, ahora]
     );
 
     const nuevaTarea = await db.get("SELECT * FROM todos WHERE id = ?", result.lastID);
@@ -114,7 +117,7 @@ router.put("/:id", async (req, res) => {
   try {
     const db = getDB();
 
-    const tarea = await db.get("SELECT * FROM todos WHERE id = ?", req.params.id);
+    const tarea = await db.get("SELECT * FROM todos WHERE id = ? AND userId = ?", [req.params.id, req.user.id]);
 
     if (!tarea) {
       return res.status(404).json({ message: "Tarea no encontrada" });
@@ -131,8 +134,8 @@ router.put("/:id", async (req, res) => {
     await db.run(
       `UPDATE todos
        SET titulo = ?, descripcion = ?, completado = ?, prioridad = ?, categoria = ?, fechaLimite = ?, updatedAt = ?
-       WHERE id = ?`,
-      [titulo, descripcion, completado ? 1 : 0, prioridad, categoria, fechaLimite, ahora, req.params.id]
+       WHERE id = ? AND userId = ?`,
+      [titulo, descripcion, completado ? 1 : 0, prioridad, categoria, fechaLimite, ahora, req.params.id, req.user.id]
     );
 
     const actualizada = await db.get("SELECT * FROM todos WHERE id = ?", req.params.id);
@@ -155,13 +158,13 @@ router.delete("/:id", async (req, res) => {
   try {
     const db = getDB();
 
-    const tarea = await db.get("SELECT * FROM todos WHERE id = ?", req.params.id);
+    const tarea = await db.get("SELECT * FROM todos WHERE id = ? AND userId = ?", [req.params.id, req.user.id]);
 
     if (!tarea) {
       return res.status(404).json({ message: "Tarea no encontrada" });
     }
 
-    await db.run("DELETE FROM todos WHERE id = ?", req.params.id);
+    await db.run("DELETE FROM todos WHERE id = ? AND userId = ?", [req.params.id, req.user.id]);
 
     res.json({
       message: "Tarea eliminada correctamente",

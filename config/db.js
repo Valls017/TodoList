@@ -12,6 +12,7 @@ async function connectDB() {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS todos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId INTEGER NOT NULL REFERENCES users(id),
       titulo TEXT NOT NULL,
       descripcion TEXT DEFAULT '',
       completado INTEGER DEFAULT 0,
@@ -23,9 +24,13 @@ async function connectDB() {
     )
   `);
 
+  // Migracion: agregar userId si la tabla ya existia sin esa columna
+  await db.exec(`ALTER TABLE todos ADD COLUMN userId INTEGER`).catch(() => {});
+
   await db.exec(`
     CREATE TABLE IF NOT EXISTS files (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId INTEGER NOT NULL REFERENCES users(id),
       originalName TEXT NOT NULL,
       storedName TEXT NOT NULL,
       mimeType TEXT DEFAULT 'application/octet-stream',
@@ -35,6 +40,9 @@ async function connectDB() {
       updatedAt TEXT NOT NULL
     )
   `);
+
+  // Migracion: agregar userId si la tabla ya existia sin esa columna
+  await db.exec(`ALTER TABLE files ADD COLUMN userId INTEGER`).catch(() => {});
 
   await db.exec(`
     CREATE TABLE IF NOT EXISTS users (

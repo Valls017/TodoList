@@ -27,7 +27,7 @@ async function enviarJSON(url, datos) {
   const resultado = await respuesta.json();
 
   if (!respuesta.ok) {
-    throw new Error(resultado.message || "Error en la solicitud");
+    throw new Error(resultado.error || resultado.message || resultado.errores?.join(", ") || "Error en la solicitud");
   }
 
   return resultado;
@@ -43,7 +43,7 @@ async function iniciarSesion(event) {
     });
 
     localStorage.setItem(TOKEN_KEY, resultado.token);
-    localStorage.setItem(USUARIO_KEY, JSON.stringify(resultado.data));
+    localStorage.setItem(USUARIO_KEY, JSON.stringify({ nombre: resultado.nombre }));
     window.location.href = "/app/";
   } catch (error) {
     mostrarMensaje(error.message);

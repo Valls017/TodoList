@@ -256,7 +256,7 @@ async function subirArchivo() {
 
   const contenido = await archivo.arrayBuffer();
 
-  await fetch(`/files?filename=${encodeURIComponent(archivo.name)}`, {
+  await fetchConAuth(`/files?filename=${encodeURIComponent(archivo.name)}`, {
     method: "POST",
     headers: {
       "Content-Type": archivo.type || "application/octet-stream"
@@ -269,7 +269,7 @@ async function subirArchivo() {
 }
 
 async function cargarArchivos() {
-  const respuesta = await fetch("/files");
+  const respuesta = await fetchConAuth("/files");
   const resultado = await respuesta.json();
   const archivos = resultado.data || [];
 
@@ -352,7 +352,7 @@ async function editarArchivo(id, nombreActual) {
 
       const contenido = await archivoNuevo.arrayBuffer();
 
-      await fetch(`/files/${id}?filename=${encodeURIComponent(nombreLimpio)}`, {
+      await fetchConAuth(`/files/${id}?filename=${encodeURIComponent(nombreLimpio)}`, {
         method: "PUT",
         headers: {
           "Content-Type": archivoNuevo.type || "application/octet-stream"
@@ -367,7 +367,7 @@ async function editarArchivo(id, nombreActual) {
     return;
   }
 
-  await fetch(`/files/${id}?filename=${encodeURIComponent(nombreLimpio)}`, {
+  await fetchConAuth(`/files/${id}?filename=${encodeURIComponent(nombreLimpio)}`, {
     method: "PUT"
   });
 
@@ -381,7 +381,7 @@ async function eliminarArchivo(id) {
     return;
   }
 
-  await fetch(`/files/${id}`, {
+  await fetchConAuth(`/files/${id}`, {
     method: "DELETE"
   });
 

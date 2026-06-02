@@ -85,6 +85,7 @@ El archivo `.env` debe contener:
 ```env
 PORT=3000
 DB_FILE=./data/todolist.db
+JWT_SECRET=cambia_este_valor_por_un_secreto_largo
 ```
 
 ---

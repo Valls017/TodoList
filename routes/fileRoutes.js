@@ -3,8 +3,11 @@ const fs = require("fs");
 const path = require("path");
 const router = express.Router();
 const { getDB } = require("../config/db");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const drivePath = path.join(__dirname, "..", "drive");
+
+router.use(authMiddleware);
 
 function asegurarDrive() {
   if (!fs.existsSync(drivePath)) {
@@ -43,7 +46,7 @@ function convertirArchivo(archivo) {
 router.get("/", async (req, res) => {
   try {
     const db = getDB();
-    const archivos = await db.all("SELECT * FROM files ORDER BY id DESC");
+    const archivos = await db.all("SELECT * FROM files WHERE userId = ? ORDER BY id DESC", req.user.id);
 
     res.json({
       metadata: {
@@ -65,7 +68,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const db = getDB();
-    const archivo = await db.get("SELECT * FROM files WHERE id = ?", req.params.id);
+    const archivo = await db.get("SELECT * FROM files WHERE id = ? AND userId = ?", [req.params.id, req.user.id]);
 
     if (!archivo) {
       return res.status(404).json({ message: "Archivo no encontrado" });
@@ -114,9 +117,9 @@ router.post(
 
       const result = await db.run(
         `INSERT INTO files
-        (originalName, storedName, mimeType, size, path, createdAt, updatedAt)
-        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [nombreOriginal, storedName, mimeType, contenido.length, rutaArchivo, ahora, ahora]
+        (userId, originalName, storedName, mimeType, size, path, createdAt, updatedAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [req.user.id, nombreOriginal, storedName, mimeType, contenido.length, rutaArchivo, ahora, ahora]
       );
 
       const nuevoArchivo = await db.get("SELECT * FROM files WHERE id = ?", result.lastID);
@@ -143,7 +146,7 @@ router.put(
     try {
       asegurarDrive();
       const db = getDB();
-      const archivo = await db.get("SELECT * FROM files WHERE id = ?", req.params.id);
+      const archivo = await db.get("SELECT * FROM files WHERE id = ? AND userId = ?", [req.params.id, req.user.id]);
 
       if (!archivo) {
         return res.status(404).json({ message: "Archivo no encontrado" });
@@ -189,7 +192,7 @@ router.put(
 router.get("/:id/download", async (req, res) => {
   try {
     const db = getDB();
-    const archivo = await db.get("SELECT * FROM files WHERE id = ?", req.params.id);
+    const archivo = await db.get("SELECT * FROM files WHERE id = ? AND userId = ?", [req.params.id, req.user.id]);
 
     if (!archivo) {
       return res.status(404).json({ message: "Archivo no encontrado" });
@@ -213,7 +216,7 @@ router.get("/:id/download", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const db = getDB();
-    const archivo = await db.get("SELECT * FROM files WHERE id = ?", req.params.id);
+    const archivo = await db.get("SELECT * FROM files WHERE id = ? AND userId = ?", [req.params.id, req.user.id]);
 
     if (!archivo) {
       return res.status(404).json({ message: "Archivo no encontrado" });
@@ -223,7 +226,7 @@ router.delete("/:id", async (req, res) => {
       await fs.promises.unlink(archivo.path);
     }
 
-    await db.run("DELETE FROM files WHERE id = ?", req.params.id);
+    await db.run("DELETE FROM files WHERE id = ? AND userId = ?", [req.params.id, req.user.id]);
 
     res.json({
       message: "Archivo eliminado correctamente",
